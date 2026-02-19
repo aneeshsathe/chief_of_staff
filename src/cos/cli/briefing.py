@@ -57,8 +57,6 @@ async def _daily_briefing(
             emails.extend([e.model_dump() for e in raw_emails])
     except Exception as e:
         print_warning(f"Gmail: {e}")
-        if verbose:
-            print_error(f"Gmail: {e}")
 
     # Try Calendar
     try:
@@ -90,8 +88,6 @@ async def _daily_briefing(
             )
     except Exception as e:
         print_warning(f"Calendar: {e}")
-        if verbose:
-            print_error(f"Calendar: {e}")
 
     # Try Apple Notes
     try:
@@ -103,8 +99,6 @@ async def _daily_briefing(
             notes = [n.model_dump() for n in raw_notes[:10]]
     except Exception as e:
         print_warning(f"Apple Notes: {e}")
-        if verbose:
-            print_error(f"Apple Notes: {e}")
 
     if dry_run:
         console.print(
