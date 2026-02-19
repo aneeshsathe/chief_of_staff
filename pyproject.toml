@@ -1,0 +1,55 @@
+[project]
+name = "chief-of-staff"
+version = "0.1.0"
+description = "AI Chief of Staff - CLI-first agent for triaging comms, managing schedules, and delivering briefings"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.0",
+    "anthropic>=0.42",
+    "google-genai>=1.0",
+    "anyio>=4.0",
+    "httpx>=0.27",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "pyyaml>=6.0",
+    "cognee>=0.1",
+    "google-auth>=2.0",
+    "google-auth-oauthlib>=1.0",
+    "google-api-python-client>=2.0",
+    "pygithub>=2.0",
+    "slack-sdk>=3.0",
+    "asana>=5.0",
+    "keyring>=25.0",
+    "structlog>=24.0",
+]
+
+[project.scripts]
+cos = "cos.cli.app:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cos"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+]

@@ -1,0 +1,156 @@
+# cos example configuration
+# Copy this file to ~/.cos/config.yaml and edit for your setup.
+# Run `cos config init` after placing client_secret.json in ~/.cos/ to complete OAuth.
+#
+# Secrets (Google tokens, API keys) are stored in the macOS Keychain by `cos config init`.
+# Do NOT put tokens or passwords in this file.
+
+# Which context to use by default.
+# Must match a key under `contexts` below.
+active_context: day_job
+
+contexts:
+
+  # -------------------------------------------------------------------------
+  # Primary role — day job
+  # -------------------------------------------------------------------------
+  day_job:
+    label: "VP Data Science"
+
+    # Google accounts to read email from.
+    # `id` is an arbitrary label used as the keychain key for OAuth tokens.
+    # Run `cos config init --account <id>` for each account you add.
+    email_accounts:
+      - id: work
+        type: google
+        address: you@company.com
+
+    # Google calendars to pull events from.
+    # `calendar_id` is the Google Calendar ID (usually the email address for
+    # the primary calendar, or a long hex string for shared calendars).
+    calendars:
+      - id: work_cal
+        type: google
+        calendar_id: primary   # or you@company.com
+
+    # Optional third-party integrations.
+    # Leave a section out entirely to disable it.
+    integrations:
+
+      # GitHub — PAT stored via `keyring set cos-chief-of-staff github-token`
+      github:
+        org: my-org
+        repos:
+          - my-org/backend
+          - my-org/ml-platform
+
+      # Slack — token stored via `keyring set cos-chief-of-staff slack-token-<workspace>`
+      slack:
+        workspace: my-company
+        channels:
+          - data-team
+          - incidents
+
+      # Asana — PAT stored via `keyring set cos-chief-of-staff asana-token`
+      # (Phase 3 — not yet implemented)
+      # asana:
+      #   workspace_gid: "12345678"
+      #   projects:
+      #     - "Q1 Data Platform"
+
+    # Free-text priorities fed to the briefing agent's system prompt.
+    # List the things you want the agent to flag first.
+    priorities:
+      - Direct report escalations
+      - Production incidents
+      - Deadlines this week
+
+  # -------------------------------------------------------------------------
+  # Secondary role — startup advisory
+  # -------------------------------------------------------------------------
+  advisory:
+    label: "Startup Advisor"
+
+    email_accounts:
+      - id: advisory
+        type: google
+        address: you@personal.com
+
+    calendars:
+      - id: advisory_cal
+        type: google
+        calendar_id: primary
+
+    integrations:
+      github:
+        org: startup-name
+        repos:
+          - startup-name/product
+
+    priorities:
+      - Fundraising asks
+      - Board prep items
+
+  # -------------------------------------------------------------------------
+  # Tertiary role — VC advisory (add if needed)
+  # -------------------------------------------------------------------------
+  # vc:
+  #   label: "VC Advisor"
+  #   email_accounts:
+  #     - id: vc
+  #       type: google
+  #       address: you@vc-firm.com
+  #   calendars:
+  #     - id: vc_cal
+  #       type: google
+  #       calendar_id: primary
+  #   priorities:
+  #     - Portfolio company updates
+  #     - Deal flow
+
+# ---------------------------------------------------------------------------
+# Sync / memory settings
+# ---------------------------------------------------------------------------
+sync:
+  # Where the Cognee knowledge graph (SQLite + LanceDB + Kuzu) lives.
+  # The iCloud path syncs automatically across Macs.
+  # Change to a local path if you don't use iCloud Drive.
+  memory_path: ~/Library/Mobile Documents/com~apple~CloudDocs/cos-data/
+
+  apple_notes:
+    enabled: true
+    # Apple Notes folder to read from (case-sensitive)
+    folder: "Chief of Staff"
+    # Tag used for ad-hoc capture (not yet used in routing, reserved)
+    tag: "#cos"
+
+# ---------------------------------------------------------------------------
+# Model configuration
+# ---------------------------------------------------------------------------
+# All models default to the values below. Override individual tiers here.
+# Supported providers: anthropic, google
+models:
+  # Cheap/fast — used for intent classification and fan-out (Phase 2+)
+  router:
+    provider: anthropic
+    model: claude-haiku-4-5
+
+  # Balanced — used for email triage, calendar analysis, and briefings
+  worker:
+    provider: anthropic
+    model: claude-sonnet-4-6
+
+  # Synthesis — merges multi-agent outputs (Phase 2+)
+  judge:
+    provider: anthropic
+    model: claude-sonnet-4-6
+
+  # Strategic synthesis — used for high-stakes decisions (Phase 2+)
+  judge_strategic:
+    provider: anthropic
+    model: claude-opus-4-6
+
+  # Bulk summarization — cheap token processing for long email threads etc.
+  summarizer:
+    provider: google
+    model: gemini-2.0-flash
